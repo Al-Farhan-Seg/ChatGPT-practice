@@ -1,15 +1,16 @@
 class Car:
-    def __init__(self, brand, model, year):
+    def __init__(self, brand, model, year, color):
         self.brand = brand
         self.model = model
         self.year = year
+        self.color = color
 
 
     def display_info(self):
-        print(f"Car: {self.brand} {self.model} ({self.year})")
+        print(f"Car:{self.color} {self.brand} {self.model} ({self.year})")
 
-car1 = Car("Toyota", "LandCruiser", 2021)
-car2 = Car("Subaru", "BRZ", 2021)
+car1 = Car("Toyota", "LandCruiser", 2009, "Blue")
+car2 = Car("Subaru", "BRZ", 2021,"Grey")
 
 car1.display_info()
 car2.display_info()   

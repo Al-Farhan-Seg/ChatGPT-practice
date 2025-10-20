@@ -1,21 +1,22 @@
-class Student:
+class BankAccount:
+    def __init__(self, owner):
+        self.owner = owner
+        self.balance = 0
 
-    def __init__(self, name, age, course):
-        self.name = name
-        self.age = age
-        self.course = course
+    def deposit(self, amount):
+        self.balance += amount
 
-    def introduce(self):
-        return f"Hello, my name is {self.name}, I am {self.age} years old and I study {self.course}"
+        return self.balance
+    
+    def withdraw(self, amount):
+        if amount > self.balance:
+            print("You have insufficient funds.....")
+        else:
+            self.balance -= amount
+            print(f"You have successfully withdrawn {amount}. Balance {self.balance}........")
 
-st_1 = Student("Farhan", 22, "BSc.CS")
-st_2 = Student("Bugembe", 20, "LLb")
-st_3 = Student("Lwanga", 25, "BBA")
-
-print(st_1.introduce())
-print(st_2.introduce())
-print(st_3.introduce())
-
-
-
-
+acc_1 = BankAccount("Al-Farhan")
+acc_1.deposit(25000)
+acc_1.withdraw(250000)
+acc_1.deposit(300000)
+acc_1.withdraw(20000)
