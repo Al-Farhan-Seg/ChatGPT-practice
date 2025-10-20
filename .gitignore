@@ -1,0 +1,97 @@
+# OS
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.lnk
+
+# VS Code
+.vscode/
+.vscode-test/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.cache
+nosetests.xml
+pytestdebug.log
+pip-log.txt
+pip-delete-this-directory.txt
+pyvenv.cfg
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+.env.*.local
+secrets.yml
+
+# IDEs / editors
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# Archives / packages / build artifacts
+*.zip
+*.tar.gz
+*.rar
+*.7z
+dist/
+build/
+*.egg
+*.whl
+
+# Databases
+*.sqlite3
+*.db
+
+# Binary / compiled
+*.exe
+*.dll
+*.so
+*.dylib
+*.class
+*.jar
+
+# Backup / temp files
+*~
+*.swp
+*.swo
+*.bak
+*.orig
+
+# Misc
+coverage/
+coverage.*
+*.cover
