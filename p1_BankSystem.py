@@ -1,14 +1,28 @@
 from datetime import datetime
-import string, random
+import string, random, csv
 class BankAccount:
     def __init__(self, owner):
         self.owner = owner
         self.__balance = 0
         self.__transactions = []
         self.__pin = 1
+        self.__csv = [[" ", self.owner, "", " "],
+                      ["Amount", "Time", "Transaction", "ID"]]
 
     def trans_ID(self):
         return "TXN-" + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+    
+    # putting transactions into a .csv file
+    def _csv_write(self, info):
+
+        file_path = rf"{self.owner}_transactions.csv"
+
+        with open(file_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            for row in info:
+                writer.writerow(row)
+            
+
   
 
     def deposit(self, amount):
@@ -24,12 +38,16 @@ class BankAccount:
                 else:
                     self.__balance += amount
                     ID = self.trans_ID()
-
-                    # Storing the transaction details into the Transaction Log
-                    self.__transactions.append({"Transaction":"Deposit",
+                    info = {"Transaction":"Deposit",
                                             "ID":ID,
                                             "Amount":amount,
-                                            "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")})
+                                            "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
+                    # Storing the transaction details into the Transaction Log
+                    self.__transactions.append(info)
+                    info_list = [amount, info["Time"], "Deposit", ID]
+                    self.__csv.append(info_list)
+
+                    self._csv_write(self.__csv)
 
                     return f"""\nDeposited: {amount}
 Transaction ID: {ID}"""
@@ -53,12 +71,17 @@ Transaction ID: {ID}"""
                 else:
                     self.__balance -= amount
                     ID = self.trans_ID()
-
-                    # Storing the transaction details into the Transaction Log
-                    self.__transactions.append({"Transaction":"Withdraw",
+                    info = {"Transaction":"Withdraw",
                                             "ID":ID,
                                             "Amount":amount,
-                                            "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")})
+                                            "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
+
+                    # Storing the transaction details into the Transaction Log
+                    self.__transactions.append(info)
+                    info_list = [amount, info["Time"], "Withdraw", ID]
+                    self.__csv.append(info_list)
+
+                    self._csv_write(self.__csv)
                     
                     return f"""\nWithdrawn: {amount}
 Transaction ID: {ID}"""
@@ -89,18 +112,27 @@ Transaction ID: {ID}"""
     
     def get_transactions_1(self):
         print("TRANSACTION HISTORY".center(40, "_"))
-        type = input("Choose transaction type ('Withdraw' or 'Deposit'): ")
-        type = type.capitalize()
-        for i in self.__transactions:
-            if type in i.values():
-                print(" ".ljust(15, "_") + " " + " ".rjust(22, "_"))
-                print("| TITLE".ljust(15, " ") + "|" + "VALUE".rjust(20, " ") + " |")
-                print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
-                for k,v in i.items():
-                    #if i["Transaction"] == type:
-                        print(f"| {k}".ljust(15, " ") + "|" + f"{v}".rjust(20, " ") + " |")
-                print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
-                print()
+        attempts = 0
+        while attempts < 3:
+            type = input("Choose transaction type ('Withdraw' or 'Deposit'): ")
+            type = type.capitalize()
+            types = ["Withdraw", "Deposit"]
+            if type in types:
+                for i in self.__transactions:
+                    if type in i.values():
+                        print(" ".ljust(15, "_") + " " + " ".rjust(22, "_"))
+                        print("| TITLE".ljust(15, " ") + "|" + "VALUE".rjust(20, " ") + " |")
+                        print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
+                        for k,v in i.items():
+                            #if i["Transaction"] == type:
+                                print(f"| {k}".ljust(15, " ") + "|" + f"{v}".rjust(20, " ") + " |")
+                        print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
+                return
+                break
+            else:
+                print("Wrong TRANSACTION type entered....TRY AGAIN")
+                attempts += 1
+        return "Too many failed attempts"
 
 
 
@@ -144,6 +176,10 @@ class SavingsAccount(BankAccount):
 class CurrentAccount(BankAccount):
     pass
 
+# I dont know how to implememnt this
+class Bank:
+    pass
+
             
 
 acc_1 = BankAccount("Al-Farhan")
@@ -167,4 +203,4 @@ print()
 
 print(acc_1.display_balance())
 
-acc_1.get_transactions_1()
+print(acc_1.get_transactions_1())
