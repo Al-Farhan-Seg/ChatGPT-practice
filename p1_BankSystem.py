@@ -89,14 +89,20 @@ Transaction ID: {ID}"""
     
     def get_transactions_1(self):
         print("TRANSACTION HISTORY".center(40, "_"))
+        type = input("Choose transaction type ('Withdraw' or 'Deposit'): ")
+        type = type.capitalize()
         for i in self.__transactions:
-            print(" ".ljust(15, "_") + " " + " ".rjust(22, "_"))
-            print("| TITLE".ljust(15, " ") + "|" + "VALUE".rjust(20, " ") + " |")
-            print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
-            for k,v in i.items():
-                print(f"| {k}".ljust(15, " ") + "|" + f"{v}".rjust(20, " ") + " |")
-            print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
-            print()
+            if type in i.values():
+                print(" ".ljust(15, "_") + " " + " ".rjust(22, "_"))
+                print("| TITLE".ljust(15, " ") + "|" + "VALUE".rjust(20, " ") + " |")
+                print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
+                for k,v in i.items():
+                    #if i["Transaction"] == type:
+                        print(f"| {k}".ljust(15, " ") + "|" + f"{v}".rjust(20, " ") + " |")
+                print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
+                print()
+
+
 
 
     def change_pin(self):
