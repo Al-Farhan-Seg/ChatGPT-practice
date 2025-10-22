@@ -7,7 +7,11 @@ class Student:
         self.__gpa = 0
         self.__email = ""
         self.courses = []  # bi-directional link: list of Course instances
-        #self.__grade = ""
+        Student.total_students += 1  # increment every time a new Student is created
+
+    @classmethod
+    def get_total_students(cls):
+        return f"Total Students Created: {cls.total_students}"
 
     def introduce(self):
         return f"Hello, my name is {self.name}, I am {self.age} years old and I study {self.course}"
@@ -73,6 +77,8 @@ class GraduateStudent(Student):
         super().__init__(name, age, course)
         self.thesis_title = thesis_title
         self.supervisor = supervisor
+
+        # Add-on: Let GraduateStudent override show_profile() to include thesis and supervisor.
     
 
 # Modelling a relationship between Student and Course
@@ -155,3 +161,6 @@ course1.list_students()
 course1.remove_student(st_2)
 print()
 course1.list_students()
+
+print(Student.get_total_students())
+
