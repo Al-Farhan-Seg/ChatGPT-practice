@@ -8,10 +8,8 @@ class BankAccount:
         self.__pin = 1
 
     def trans_ID(self):
-        
         return "TXN-" + ''.join(random.sample(string.ascii_letters + string.digits, 10))
-
-        
+  
 
     def deposit(self, amount):
         print("ACCOUNT DEPOSIT Management".center(50, "_"))
@@ -19,30 +17,26 @@ class BankAccount:
 
         # to limit number of PIN input attempts to 3
         while attempts < 3:
-            try:
-                pin = int(input("Depo-Enter account PIN: "))
-                if pin != self.__pin:
-                    print("Access Denied.....")
-                    attempts += 1
-                else:
-                    if amount <= 0:
+            depo = self._verify_pin(attempts)
+            if depo == True:
+                if amount <= 0:
                         return "\nDeposit amount MUST be positive...."
-                    else:
-                        self.__balance += amount
-                        ID = self.trans_ID()
+                else:
+                    self.__balance += amount
+                    ID = self.trans_ID()
 
-                        # Storing the transaction details into the Transaction Log
-                        self.__transactions.append({"Transaction":"Deposit",
-                                                "ID":ID,
-                                                "Amount":amount,
-                                                "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")})
+                    # Storing the transaction details into the Transaction Log
+                    self.__transactions.append({"Transaction":"Deposit",
+                                            "ID":ID,
+                                            "Amount":amount,
+                                            "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")})
 
-                        return f"""\nDeposited: {amount}
+                    return f"""\nDeposited: {amount}
 Transaction ID: {ID}"""
-            
-            # to catch any non-integer inputs by USER
-            except ValueError:
-                print("PIN should only be an INTEGER")
+            elif depo == False:
+                attempts += 1
+            else:
+                print(depo)
         
         return "Too many Failed attempts" 
     
@@ -52,30 +46,26 @@ Transaction ID: {ID}"""
 
         # to limit number of PIN input attempts to 3
         while attempts < 3:
-            try:
-                pin = int(input("Wdraw-Enter account PIN:"))
-                if pin != self.__pin:
-                    print("Access Denied.....")
-                    attempts += 1
+            w_draw = self._verify_pin(attempts)
+            if w_draw == True:
+                if amount > self.__balance:
+                    return "\nYou have insufficient funds....."
                 else:
-                    if amount > self.__balance:
-                        return "\nYou have insufficient funds....."
-                    else:
-                        self.__balance -= amount
-                        ID = self.trans_ID()
+                    self.__balance -= amount
+                    ID = self.trans_ID()
 
-                        # Storing the transaction details into the Transaction Log
-                        self.__transactions.append({"Transaction":"Withdraw",
-                                                "ID":ID,
-                                                "Amount":amount,
-                                                "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")})
-                        
-                        return f"""\nWithdrawn: {amount}
+                    # Storing the transaction details into the Transaction Log
+                    self.__transactions.append({"Transaction":"Withdraw",
+                                            "ID":ID,
+                                            "Amount":amount,
+                                            "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")})
+                    
+                    return f"""\nWithdrawn: {amount}
 Transaction ID: {ID}"""
-            
-            # to catch any non-integer inputs by USER
-            except ValueError:
-                print("PIN should only be an INTEGER")
+            elif w_draw == False:
+                attempts += 1
+            else:
+                print(w_draw)
 
         return "Too many Failed attempts"
     
@@ -86,17 +76,13 @@ Transaction ID: {ID}"""
 
         # to limit number of PIN input attempts to 3
         while attempts < 3:
-            try:
-                pin = int(input("Enter account PIN: "))
-                if pin != self.__pin:
-                    print("Access Denied......")
-                    attempts += 1
-                else:
-                    return f"Account Balance: {self.__balance}"
-                
-            # to catch any non-integer inputs by USER
-            except ValueError:
-                print("PIN should only be an INTEGER")
+            bal_disp = self._verify_pin(attempts)
+            if bal_disp == True:
+                return f"Account Balance: {self.__balance}"
+            elif bal_disp == False:
+                attempts += 1
+            else:
+                print(bal_disp)
         
         return "Too Many Failed Attempts"
     
@@ -118,17 +104,39 @@ Transaction ID: {ID}"""
         attempts = 0
         # to limit the number of PIN input attempts to 3
         while attempts < 3:
-            try:
-                old_pin = int(input("Enter OLD Account PIN: "))
-                if old_pin != self.__pin:
-                    print("PIN doesnot match saved PIN")
-                else:
-                    new_pin = int(input("Enter NEW account PIN: "))
-                    self.__pin = new_pin
-                    return f"PIN successfully changed"
-            except ValueError:
-                print("PIN must only be INTEGER")
+            change = self._verify_pin(attempts)
+            if change == True:
+                new_pin = int(input("Enter NEW account PIN: "))
+                self.__pin = new_pin
+                return f"PIN successfully changed"
+            elif change == False:
+                attempts += 1
+            else:
+                print(change)
+
         return "Too Many Failed Attempts"
+    
+    def _verify_pin(self, attempts):
+        try:
+            pin = int(input("Enter account PIN: "))
+            if pin != self.__pin:
+                # attempts += 1
+                print("PIN incorrect")
+                return False
+            else:
+                return True
+        # to catch any non-integer INPUTS
+        except ValueError:
+            return "PIN must only be an integer"
+    
+
+class SavingsAccount(BankAccount):
+    def __init__(self, owner):
+        super().__init__(owner)
+
+# I dont know how to implememnt this
+class CurrentAccount(BankAccount):
+    pass
 
             
 
