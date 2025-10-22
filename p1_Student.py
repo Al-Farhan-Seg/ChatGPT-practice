@@ -12,17 +12,14 @@ class Student:
     def introduce(self):
         return f"Hello, my name is {self.name}, I am {self.age} years old and I study {self.course}"
     
-    def set_gpa(self, value):
+    def update_gpa(self, value):
         value = int(value)
         if 0.0 <= value <= 4.0:
             self.__gpa = value
 
-    def update_gpa(self, value):
-        value = int(value)
-        self.__gpa = value
 
     def get_gpa(self):
-        return {self.__gpa}
+        return self.__gpa
     
     def get_grade(self):
         gpa = self.get_gpa()
@@ -94,25 +91,34 @@ class Course:
                 return "Student is already enrolled in course"
             else:
                 self.__students.append(student_obj)
+                self._txt_write()
                 #AI gen
                 student_obj.add_course(self)
                 return True
+            
+    # writing the students to a .txt file            
+    def _txt_write(self):
+        file_path = rf"{self.__course_name}_students_list.txt"
+
+        with open(file_path, "w", newline="") as file:
+            for i in self.__students:
+                file.write(f"{i.name}\n")
+        return file_path
 
     def remove_student(self, student_obj):
         self.__students.remove(student_obj)
+        self._txt_write()
 
     def list_students(self):
         print("Student's List".center(50,"_"))
         for i in self.__students:
             print(f"- {i.name}")
 
-    def set_course(self, course_name, code):
-        self.__course_name = course_name
-        self.__code = code
-
     def update_course(self, course_name, code):
         self.__course_name = course_name
         self.__code = code
+        
+
 
     def get_course(self):
         return f"You have enrolled for {self.__course_name} ({self.__code})"
@@ -130,14 +136,14 @@ st_3.__gpa = 2.0
 print(st_3.get_gpa())
 
 #print(st_2.__email)
-st_1.set_gpa(2.67)
-st_3.get_grade()
+st_1.update_gpa(2.67)
+print(st_1.get_grade())
 print(st_1.show_profile())
 from time import sleep
 
 sleep(5)
 course1 = Course()
-course1.set_course("Computer Science", "BSc.CS")
+course1.update_course("Computer Science", "BSc.CS")
 st_1.enroll(course1)
 st_1.enroll(course1)
 
