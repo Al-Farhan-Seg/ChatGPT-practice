@@ -7,25 +7,42 @@ class Student:
         self.__gpa = 0
         self.__email = ""
         self.courses = []  # bi-directional link: list of Course instances
+        #self.__grade = ""
 
     def introduce(self):
         return f"Hello, my name is {self.name}, I am {self.age} years old and I study {self.course}"
     
     def set_gpa(self, value):
+        value = int(value)
         if 0.0 <= value <= 4.0:
             self.__gpa = value
 
     def update_gpa(self, value):
+        value = int(value)
         self.__gpa = value
 
     def get_gpa(self):
-        return self.__gpa
+        return {self.__gpa}
+    
+    def get_grade(self):
+        gpa = self.get_gpa()
+        if gpa == 0:
+            return f"Grade: F"
+        elif 0.0 < gpa <= 1.0:
+            return f"Grade: D"
+        elif 1.0 < gpa <= 2.0:
+            return f"Grade: C"
+        elif 2.0 < gpa <= 3.0:
+            return f"Grade: B"
+        else:
+            return f"Grade: A"
+
     
     def set_email(self):
         self.__email = f"{self.name}".lower() + ".iuiu.ac@gmail.com"
 
     def get_email(self):
-        return self.__email
+        return f"E-mail: {self.__email}"
     
     def show_profile(self):
         return f"""-----------Student Profile-------------
@@ -53,6 +70,12 @@ GPA: {self.get_gpa()}"""
             print(course_obj.get_course())
         else:
             print(f"{self.name} is already enrolled in {course_obj.get_course()}")
+
+class GraduateStudent(Student):
+    def __init__(self, name, age, course, thesis_title, supervisor):
+        super().__init__(name, age, course)
+        self.thesis_title = thesis_title
+        self.supervisor = supervisor
     
 
 # Modelling a relationship between Student and Course
@@ -64,13 +87,16 @@ class Course:
         self.__students = []
 
     def add_student(self, student_obj):
-        if student_obj in self.__students:
-            return "Student is already enrolled in course"
+        if len(self.__students) == 30:
+            return "Cannot add more than 30 students"
         else:
-            self.__students.append(student_obj)
-            #AI gen
-            student_obj.add_course(self)
-            return True
+            if student_obj in self.__students:
+                return "Student is already enrolled in course"
+            else:
+                self.__students.append(student_obj)
+                #AI gen
+                student_obj.add_course(self)
+                return True
 
     def remove_student(self, student_obj):
         self.__students.remove(student_obj)
@@ -105,9 +131,11 @@ print(st_3.get_gpa())
 
 #print(st_2.__email)
 st_1.set_gpa(2.67)
-
+st_3.get_grade()
 print(st_1.show_profile())
+from time import sleep
 
+sleep(5)
 course1 = Course()
 course1.set_course("Computer Science", "BSc.CS")
 st_1.enroll(course1)
