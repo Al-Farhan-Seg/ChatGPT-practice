@@ -168,17 +168,27 @@ Transaction ID: {ID}"""
             return "PIN must only be an integer"
     
 
-class SavingsAccount(BankAccount):
-    def __init__(self, owner):
-        super().__init__(owner)
-
-# I dont know how to implememnt this
-class CurrentAccount(BankAccount):
-    pass
-
-# I dont know how to implememnt this
+#Implementing a BANK to manage multiple accounts
 class Bank:
-    pass
+    def __init__(self, name):
+        self.name = name
+        self.accounts = []
+
+    def add_account(self, account):
+        self.accounts.append(account)
+        print(f"Account for {account.owner} added to {self.name} Bank")
+
+    def list_accounts(self):
+        print(f"Accounts in {self.name}".center(50, "_"))
+        for acc in self.accounts:
+            print(f"- {acc.owner}")
+
+    def find_account(self, owner_name):
+        for acc in self.accounts:
+            if acc.owner.lower() == owner_name.lower():
+                return acc
+        return None
+
 
             
 
