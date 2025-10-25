@@ -1,5 +1,6 @@
 from datetime import datetime
 import string, random, csv, os
+
 class BankAccount:
     def __init__(self, owner):
         self.owner = owner
@@ -27,8 +28,7 @@ class BankAccount:
    
             writer.writerow(info)
   
-      
-        
+  
 
     def deposit(self, amount):
         print(f"{self.owner} DEPOSIT Management".center(50, "_"))
@@ -102,7 +102,7 @@ Transaction ID: {ID}"""
     
         
     def display_balance(self):
-        print("Balance Display".center(50, "_"))
+        print(f"{self.owner}'s Balance Display".center(50, "_"))
         attempts = 0
 
         # to limit number of PIN input attempts to 3
@@ -120,27 +120,39 @@ Transaction ID: {ID}"""
     
     
     def get_transactions_1(self):
-        print("TRANSACTION HISTORY".center(40, "_"))
+        print(f"{self.owner} TRANSACTION HISTORY".center(40, "_"))
+
         attempts = 0
         while attempts < 3:
-            type = input("Choose transaction type ('Withdraw' or 'Deposit'): ")
-            type = type.capitalize()
-            types = ["Withdraw", "Deposit"]
-            if type in types:
-                for i in self.__transactions:
-                    if type in i.values():
-                        print(" ".ljust(15, "_") + " " + " ".rjust(22, "_"))
-                        print("| TITLE".ljust(15, " ") + "|" + "VALUE".rjust(20, " ") + " |")
-                        print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
-                        for k,v in i.items():
-                            #if i["Transaction"] == type:
-                                print(f"| {k}".ljust(15, " ") + "|" + f"{v}".rjust(20, " ") + " |")
-                        print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
-                return
-                break
-            else:
-                print("Wrong TRANSACTION type entered....TRY AGAIN")
+            get_trans = self._verify_pin(attempts)
+            if get_trans == True:
+
+                type_attempts = 0
+                while type_attempts < 3:
+                    type = input("Choose transaction type ('Withdraw','Deposit' and 'Transfer'): ")
+                    type = type.capitalize()
+                    types = ["Withdraw", "Deposit", "Transfer"]
+                    if type in types:
+                        for i in self.__transactions:
+                            if type in i.values():
+                                print(" ".ljust(15, "_") + " " + " ".rjust(22, "_"))
+                                print("| TITLE".ljust(15, " ") + "|" + "VALUE".rjust(20, " ") + " |")
+                                print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
+                                for k,v in i.items():
+                                    #if i["Transaction"] == type:
+                                        print(f"| {k}".ljust(15, " ") + "|" + f"{v}".rjust(20, " ") + " |")
+                                print(" ".ljust(15, "-") + " " + " ".rjust(22, "-"))
+                        return
+                    else:
+                        print("Wrong TRANSACTION type entered....TRY AGAIN")
+                        type_attempts += 1
+                    
+                return "Too many failed attempts"
+            elif get_trans == False:
                 attempts += 1
+            else:
+                print(get_trans)
+
         return "Too many failed attempts"
 
 
@@ -177,7 +189,7 @@ Transaction ID: {ID}"""
         except ValueError:
             return "PIN must only be an integer"
         
-        
+    # this for the 'BankAccount' sending the funds to record a Funds-Sent transaction.    
     def funds_transfer(self, bank_obj, account_obj):
         print(f"{self.owner} FUNDS TRANSFER Management".center(50, "_"))
         attempts = 0
@@ -185,7 +197,7 @@ Transaction ID: {ID}"""
         while attempts < 3:
             eft = self._verify_pin(attempts)
             if eft == True:
-                if account_obj not in bank_obj.accounts:
+                if account_obj not in bank_obj._Bank__accounts:
                     return f"{account_obj.owner} has no account in {bank_obj.name}"
                 else:
                     am_attempts = 0
@@ -200,16 +212,18 @@ Transaction ID: {ID}"""
                                 self.__balance -= transfer_am
                                 account_obj._BankAccount__balance += transfer_am
                                 ID = self.trans_ID()
-                                info = {"Transaction":"Withdraw",
+                                info = {"Transaction":"Funds-Sent",
                                                         "ID":ID,
                                                         "Amount":transfer_am,
                                                         "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
                                 
                                 # Storing the transaction details into the Transaction Log
                                 self.__transactions.append(info)
-                                info_list = [transfer_am, info["Time"], "Transfer", ID, self.__balance]
+                                info_list = [transfer_am, info["Time"], "Funds-Sent", ID, self.__balance]
 
                                 self._csv_write(info_list)
+
+                                account_obj._accept_fund(transfer_am, ID)
 
                                 return f"Amount of {transfer_am} succefully transferred to {account_obj.owner}"
                             
@@ -224,6 +238,20 @@ Transaction ID: {ID}"""
                 print(eft)
 
         return "Too many Failed attempts (p)"
+    
+    # this for the 'BankAccount' receiving the funds to record a Funds-Received transaction.
+    def _accept_fund(self, received, f_ID):
+        info = {"Transaction":"Funds-Received",
+                                "ID":f_ID,
+                                "Amount":received,
+                                "Time":datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
+        
+        # Storing the transaction details into the Transaction Log
+        self.__transactions.append(info)
+        info_list = [received, info["Time"], "Funds-Received", f_ID, self.__balance]
+
+        self._csv_write(info_list)
+        
 
 
         
@@ -247,15 +275,22 @@ class Bank:
         self.__acc_nos = []
 
     # adds the "given" BankAccount object to the self.__accounts list of the current Bank instance
-    def add_account(self, account):
-        self.__accounts.append(account)
-        self.acc_no_gen(account)
-        print(f"Account for {account.owner} added to {self.name} ")
+    def add_account(self, account_obj):
+        if account_obj in self.__accounts:
+            print(f"Account Provided is already registered in {self.name}")
+        else:
+            self.__accounts.append(account_obj)
+            self._acc_no_gen(account_obj)
+            print(f"Account successfully added to {self.name} ")
 
     # removes the "given" BankAccount object from the self.__accounts list of the current Bank instance
-    def remove_account(self, account):
-        self.__accounts.remove(account)
-        print(f"Account for {account.owner} removed from {self.name}")
+    def remove_account(self, account_obj):
+        if account_obj not in self.__accounts:
+            print(f"Account Provided is not registered in {self.name}")
+        else:
+            self.__accounts.remove(account_obj)
+            self.__acc_nos.remove({account_obj._BankAccount__acc_no : account_obj.owner})
+            print(f"Account successfully removed from {self.name}")
 
     # returns all the BankAccount owner names registered in the current "Bank" instance
     def list_accounts(self):
@@ -275,7 +310,7 @@ class Bank:
                 return f"Account for {owner_name} is registered in {self.name}"
         return f"Account for {owner_name} is not registered in {self.name}"
     
-    def acc_no_gen(self, account_obj):
+    def _acc_no_gen(self, account_obj):
         while True:
             acc_no = random.randint(1000000000,9999999999)
 
