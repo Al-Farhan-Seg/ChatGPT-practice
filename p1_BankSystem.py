@@ -1,13 +1,13 @@
 from datetime import datetime
-import string, random, csv
+import string, random, csv, os
 class BankAccount:
     def __init__(self, owner):
         self.owner = owner
         self.__balance = 0
         self.__transactions = []
         self.__pin = 1
-        self.__csv = [[" ", self.owner, "", " "],
-                      ["Amount", "Time", "Transaction", "ID"]]
+        self.__csv = [[" ", " ", self.owner, " ", " "],
+                      ["Amount", "Time", "Transaction", "ID", "Balance"]]
 
     def trans_ID(self):
         return "TXN-" + ''.join(random.sample(string.ascii_letters + string.digits, 10))
@@ -17,12 +17,17 @@ class BankAccount:
 
         file_path = rf"{self.owner}_transactions.csv"
 
-        with open(file_path, "w", newline="") as file:
+        file_exists = os.path.exists(file_path)
+        with open(file_path, "a", newline="") as file:
             writer = csv.writer(file)
-            for row in info:
-                writer.writerow(row)
-            
-
+            if not file_exists:
+                for row in self.__csv:
+                    writer.writerow(row)
+   
+            writer.writerow(info)
+  
+      
+        
 
     def deposit(self, amount):
         print(f"{self.owner} DEPOSIT Management".center(50, "_"))
@@ -43,10 +48,9 @@ class BankAccount:
                                             "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
                     # Storing the transaction details into the Transaction Log
                     self.__transactions.append(info)
-                    info_list = [amount, info["Time"], "Deposit", ID]
-                    self.__csv.append(info_list)
+                    info_list = [amount, info["Time"], "Deposit", ID, self.__balance]
 
-                    self._csv_write(self.__csv)
+                    self._csv_write(info_list)
 
                     return f"""\nDeposited: {amount}
 Transaction ID: {ID}"""
@@ -57,6 +61,8 @@ Transaction ID: {ID}"""
         
         return "Too many Failed attempts" 
     
+
+    
     def withdraw(self, amount):
         print(f"{self.owner} WITHDRAWAL Management".center(50, "_"))
         attempts = 0
@@ -65,25 +71,27 @@ Transaction ID: {ID}"""
         while attempts < 3:
             w_draw = self._verify_pin(attempts)
             if w_draw == True:
-                if amount > self.__balance:
-                    return "\nYou have insufficient funds....."
+                if amount <= 0:
+                    return "Amount has to be greater than ZERO"
                 else:
-                    self.__balance -= amount
-                    ID = self.trans_ID()
-                    info = {"Transaction":"Withdraw",
-                                            "ID":ID,
-                                            "Amount":amount,
-                                            "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
+                    if amount > self.__balance:
+                        return "\nYou have insufficient funds....."
+                    else:
+                        self.__balance -= amount
+                        ID = self.trans_ID()
+                        info = {"Transaction":"Withdraw",
+                                                "ID":ID,
+                                                "Amount":amount,
+                                                "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
 
-                    # Storing the transaction details into the Transaction Log
-                    self.__transactions.append(info)
-                    info_list = [amount, info["Time"], "Withdraw", ID]
-                    self.__csv.append(info_list)
+                        # Storing the transaction details into the Transaction Log
+                        self.__transactions.append(info)
+                        info_list = [amount, info["Time"], "Withdraw", ID, self.__balance]
 
-                    self._csv_write(self.__csv)
-                    
-                    return f"""\nWithdrawn: {amount}
-Transaction ID: {ID}"""
+                        self._csv_write(info_list)
+                        
+                        return f"""\nWithdrawn: {amount}
+    Transaction ID: {ID}"""
             elif w_draw == False:
                 attempts += 1
             else:
@@ -107,6 +115,7 @@ Transaction ID: {ID}"""
                 print(bal_disp)
         
         return "Too Many Failed Attempts"
+    
     
     
     def get_transactions_1(self):
@@ -153,6 +162,7 @@ Transaction ID: {ID}"""
 
         return "Too Many Failed Attempts"
     
+
     def _verify_pin(self, attempts):
         try:
             pin = int(input("Enter account PIN: "))
@@ -165,6 +175,56 @@ Transaction ID: {ID}"""
         # to catch any non-integer INPUTS
         except ValueError:
             return "PIN must only be an integer"
+        
+        
+    def funds_transfer(self, bank_obj, account_obj):
+        print(f"{self.owner} FUNDS TRANSFER Management".center(50, "_"))
+        attempts = 0
+        
+        while attempts < 3:
+            eft = self._verify_pin(attempts)
+            if eft == True:
+                if account_obj not in bank_obj.accounts:
+                    return f"{account_obj.owner} has no account in {bank_obj.name}"
+                else:
+                    am_attempts = 0
+
+                    while am_attempts < 3:
+                        try:
+                            transfer_am = int(input(f"How much do you want to transfer to {account_obj.owner}'s account: "))
+                            if transfer_am > self.__balance:
+                                am_attempts += 1
+                                print("You have insufficient funds")
+                            else:
+                                self.__balance -= transfer_am
+                                account_obj._BankAccount__balance += transfer_am
+                                ID = self.trans_ID()
+                                info = {"Transaction":"Withdraw",
+                                                        "ID":ID,
+                                                        "Amount":transfer_am,
+                                                        "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
+                                
+                                # Storing the transaction details into the Transaction Log
+                                self.__transactions.append(info)
+                                info_list = [transfer_am, info["Time"], "Transfer", ID, self.__balance]
+
+                                self._csv_write(info_list)
+
+                                return f"Amount of {transfer_am} succefully transferred to {account_obj.owner}"
+                            
+                        except ValueError:
+                            print("TRANSFER amount has to be an integer")
+
+                    return "Too many failed attempts (a)"
+
+            elif eft == False:
+                attempts += 1
+            else:
+                print(eft)
+
+        return "Too many Failed attempts (p)"
+
+
         
 class SavingsAccount(BankAccount):
     def __init__(self, owner, interest_rate=0.05):
