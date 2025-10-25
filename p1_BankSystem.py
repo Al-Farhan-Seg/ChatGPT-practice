@@ -3,6 +3,7 @@ import string, random, csv, os
 class BankAccount:
     def __init__(self, owner):
         self.owner = owner
+        self.__acc_no = 0
         self.__balance = 0
         self.__transactions = []
         self.__pin = 1
@@ -242,30 +243,48 @@ class SavingsAccount(BankAccount):
 class Bank:
     def __init__(self, name):
         self.name = name
-        self.accounts = []
+        self.__accounts = []
+        self.__acc_nos = []
 
-    # adds the "given" BankAccount object to the self.accounts list of the current Bank instance
+    # adds the "given" BankAccount object to the self.__accounts list of the current Bank instance
     def add_account(self, account):
-        self.accounts.append(account)
+        self.__accounts.append(account)
+        self.acc_no_gen(account)
         print(f"Account for {account.owner} added to {self.name} ")
 
-    # removes the "given" BankAccount object from the self.accounts list of the current Bank instance
+    # removes the "given" BankAccount object from the self.__accounts list of the current Bank instance
     def remove_account(self, account):
-        self.accounts.remove(account)
+        self.__accounts.remove(account)
         print(f"Account for {account.owner} removed from {self.name}")
 
     # returns all the BankAccount owner names registered in the current "Bank" instance
     def list_accounts(self):
-        print(f"Accounts in {self.name}".center(50, "_"))
-        for acc in self.accounts:
-            print(f"- {acc.owner}")
+        print(f"{self.name} Account Database".center(40,"_"))
+        print(" ".ljust(20, "-") + " " + " ".rjust(22, "-"))
+        print("| ACCOUNT OWNER".ljust(20, " ") + "|" + "ACCOUNT NUMBER".rjust(20, " ") + " |")
+        print(" ".ljust(20, "-") + " " + " ".rjust(22, "-"))
+        for i in self.__acc_nos:
+            for k, v in i.items():
+                print(f"| {k}".ljust(20, " ") + "|" + f"{v}".rjust(20, " ") + " |")
+        print(" ".ljust(20, "-") + " " + " ".rjust(22, "-"))
 
     # checks the availability of a 'given' owner's BankAccount in the record of registered BankAccounts to the current Bank instance
     def find_account(self, owner_name):
-        for acc in self.accounts:
+        for acc in self.__accounts:
             if acc.owner.lower() == owner_name.lower():
                 return f"Account for {owner_name} is registered in {self.name}"
         return f"Account for {owner_name} is not registered in {self.name}"
+    
+    def acc_no_gen(self, account_obj):
+        while True:
+            acc_no = random.randint(1000000000,9999999999)
+
+            if {acc_no : account_obj.owner} in self.__acc_nos:
+                continue
+            else:
+                self.__acc_nos.append({acc_no : account_obj.owner})
+                account_obj._BankAccount__acc_no = acc_no
+                break
 
 
             
