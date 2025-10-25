@@ -38,10 +38,14 @@ dist/
 build/
 pip-wheel-metadata/
 
-#----------------
+
+#----------------My Files--------
 Add_Ons/
 mytests.py
 Phase_One_adds.py
+bank_test.py
+student_test.py
+*.csv
 
 # Jupyter
 .ipynb_checkpoints
