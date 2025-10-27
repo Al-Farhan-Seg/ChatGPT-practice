@@ -43,13 +43,13 @@ class BankAccount:
                 else:
                     self.__balance += amount
                     ID = self.trans_ID()
-                    info = {"Transaction":"Deposit",
+                    info = {"Transaction":"DEPOSIT",
                                             "ID":ID,
                                             "Amount":amount,
                                             "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
                     # Storing the transaction details into the Transaction Log
                     self.__transactions.append(info)
-                    info_list = [amount, info["Time"], "Deposit", ID, self.__balance]
+                    info_list = [amount, info["Time"], "DEPOSIT", ID, self.__balance]
 
                     self._csv_write(info_list)
 
@@ -80,14 +80,14 @@ Transaction ID: {ID}"""
                     else:
                         self.__balance -= amount
                         ID = self.trans_ID()
-                        info = {"Transaction":"Withdraw",
+                        info = {"Transaction":"WITHDRAW",
                                                 "ID":ID,
                                                 "Amount":amount,
                                                 "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
 
                         # Storing the transaction details into the Transaction Log
                         self.__transactions.append(info)
-                        info_list = [amount, info["Time"], "Withdraw", ID, self.__balance]
+                        info_list = [amount, info["Time"], "WITHDRAW", ID, self.__balance]
 
                         self._csv_write(info_list)
                         
@@ -129,9 +129,9 @@ Transaction ID: {ID}"""
 
                 type_attempts = 0
                 while type_attempts < 3:
-                    type = input("Choose transaction type ('Withdraw','Deposit' and 'Transfer'): ")
-                    type = type.capitalize()
-                    types = ["Withdraw", "Deposit", "Transfer"]
+                    type = input("Choose transaction type ('WITHDRAW','DEPOSIT', 'FUNDS SENT' and 'FUNDS RECEIVED'): ")
+                    type = type.upper()
+                    types = ["WITHDRAW", "DEPOSIT", "FUNDS SENT", "FUNDS RECEIVED"]
                     if type in types:
                         for i in self.__transactions:
                             if type in i.values():
@@ -212,14 +212,14 @@ Transaction ID: {ID}"""
                                 self.__balance -= transfer_am
                                 account_obj._BankAccount__balance += transfer_am
                                 ID = self.trans_ID()
-                                info = {"Transaction":"Funds-Sent",
+                                info = {"Transaction":"FUNDS SENT",
                                                         "ID":ID,
                                                         "Amount":transfer_am,
                                                         "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
                                 
                                 # Storing the transaction details into the Transaction Log
                                 self.__transactions.append(info)
-                                info_list = [transfer_am, info["Time"], "Funds-Sent", ID, self.__balance]
+                                info_list = [transfer_am, info["Time"], "FUNDS SENT", ID, self.__balance]
 
                                 self._csv_write(info_list)
 
@@ -241,14 +241,14 @@ Transaction ID: {ID}"""
     
     # this for the 'BankAccount' receiving the funds to record a Funds-Received transaction.
     def _accept_fund(self, received, f_ID):
-        info = {"Transaction":"Funds-Received",
+        info = {"Transaction":"FUNDS RECEIVED",
                                 "ID":f_ID,
                                 "Amount":received,
                                 "Time":datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
         
         # Storing the transaction details into the Transaction Log
         self.__transactions.append(info)
-        info_list = [received, info["Time"], "Funds-Received", f_ID, self.__balance]
+        info_list = [received, info["Time"], "FUNDS RECEIVED", f_ID, self.__balance]
 
         self._csv_write(info_list)
         
@@ -256,14 +256,21 @@ Transaction ID: {ID}"""
 
         
 class SavingsAccount(BankAccount):
-    def __init__(self, owner, interest_rate=0.05):
-        super().__init__(owner)
-        self.interest_rate = interest_rate
+    interest_rate = 0.05
 
     def apply_interest(self):
-        interest = self._BankAccount__balance * self.interest_rate
+        interest = self._BankAccount__balance * SavingsAccount.interest_rate
         self._BankAccount__balance += interest
-        print(f"Interest of {interest} applied at rate {self.interest_rate * 100}%")
+        print(f"Interest of {interest} applied at rate {SavingsAccount.interest_rate * 100}%")
+        ID= self.trans_ID()
+        info = {"Transaction":"Interest",
+                     "ID": ID,
+                     "Amount": interest,
+                     "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
+        self._BankAccount__transactions.append(info)
+        info_list = [interest, info["Time"], "Interest", ID, self._BankAccount__balance]
+
+        self._csv_write(info_list)
 
     
 
@@ -321,5 +328,8 @@ class Bank:
                 account_obj._BankAccount__acc_no = acc_no
                 break
 
+    def interest_to_all(self):
+        for account in self.__accounts:
+            account.apply_interest()
 
             
