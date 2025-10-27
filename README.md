@@ -6,6 +6,7 @@
 <ol>
   <li>PHASE 1: Beginner OOP — Classes and Objects</li>
   <li>PHASE 2: Encapsulation & Controlled Access</li>
+  <li>PHASE 3: Advanced OOP & Real-World Systems</li>
 </ol>
 
 ## My ChatGPT Project chats:
