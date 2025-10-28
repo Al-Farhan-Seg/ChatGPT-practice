@@ -19,7 +19,6 @@ class Student:
         return f"Hello, my name is {self.name}, I am {self.age} years old"
     
     # setting and updating the GPA of the current Student instance
-
     def update_gpa(self):
         total_gpcu = 0
         total_cu = 0
@@ -60,18 +59,42 @@ class Student:
         return self.__gpa
     
     # returning the particular GRADE of the current Student instance in relation to it's GPA
-    def get_grade(self):
-        gpa = self.get_gpa()
-        if gpa == 0:
-            return f"Grade: F"
-        elif 0.0 < gpa <= 1.0:
-            return f"Grade: D"
-        elif 1.0 < gpa <= 2.0:
-            return f"Grade: C"
-        elif 2.0 < gpa <= 3.0:
-            return f"Grade: B"
+    def get_grade(self, course_obj):
+        if course_obj not in self.__courses:
+            return f"{self.name} is not enrolled for {course_obj._Course__course_name}"
         else:
-            return f"Grade: A"
+            for i in self.__grades:
+                for k,v in i.items():
+                    if k == course_obj._Course__course_name:
+                        mark = v
+                        if 0 <= v < 60:
+                            grade_point = 0.0
+                            rank = "F"
+                        elif 60 <= v < 70:
+                            grade_point = 1.0
+                            rank = "D"
+                        elif 70 <= v < 75:
+                            grade_point = 2.0
+                            rank = "C"
+                        elif 75 <= v < 80:
+                            grade_point = 2.5
+                            rank = "C+"
+                        elif 80 <= v < 85:
+                            grade_point = 3.0
+                            rank = "B"
+                        elif 85 <= v < 90:
+                            grade_point = 3.5
+                            rank = "B+"
+                        elif 90 <= v < 101:
+                            grade_point = 4.0
+                            rank = "B"
+                        break
+        return f"""Student: {self.name}
+Course: {course_obj._Course__course_name}
+Grade: {mark}
+Grade Point: {grade_point}
+Rank: {rank}"""
+
 
     # setting the e-mail of the current Student instance {since it is private}
     def set_email(self):
