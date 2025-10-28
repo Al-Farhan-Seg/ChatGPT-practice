@@ -2,10 +2,29 @@ from datetime import datetime
 import string, random, csv, os
 
 class BankAccount:
+    def assign_balance(self):
+        file_path = rf"{self.owner}_transactions.csv"
+
+        check = os.path.exists(file_path)
+        if not check:
+            return 0
+        else:
+            with open(file_path, "r") as csv_file:
+                content = csv.reader(csv_file)
+                csv_list = []
+                for row in content:
+                    csv_list.append(row)
+                
+                balance = csv_list[-1][-1]
+                balance = float(balance)
+                return balance
+        
+
+
     def __init__(self, owner):
         self.owner = owner
         self.__acc_no = 0
-        self.__balance = 0
+        self.__balance = self.assign_balance()
         self.__transactions = []
         self.__pin = 1
         self.__csv = [[" ", " ", self.owner, " ", " "],
@@ -129,7 +148,7 @@ Transaction ID: {ID}"""
 
                 type_attempts = 0
                 while type_attempts < 3:
-                    type = input("Choose transaction type ('WITHDRAW','DEPOSIT', 'FUNDS SENT' and 'FUNDS RECEIVED'): ")
+                    type = input("Choose transaction type ('WITHDRAW','DEPOSIT','INTEREST', 'FUNDS SENT' and 'FUNDS RECEIVED'): ")
                     type = type.upper()
                     types = ["WITHDRAW", "DEPOSIT", "FUNDS SENT", "FUNDS RECEIVED"]
                     if type in types:
@@ -268,7 +287,7 @@ class SavingsAccount(BankAccount):
                      "Amount": interest,
                      "Time": datetime.now().strftime("%d-%m-%Y, %H:%M:%S")}
         self._BankAccount__transactions.append(info)
-        info_list = [interest, info["Time"], "Interest", ID, self._BankAccount__balance]
+        info_list = [interest, info["Time"], "INTEREST", ID, self._BankAccount__balance]
 
         self._csv_write(info_list)
 
