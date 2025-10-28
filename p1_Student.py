@@ -7,8 +7,8 @@ class Student:
         self.age = age
         self.__gpa = 0
         self.__email = ""
-        self.__courses = []  # bi-directional link: list of Course instances
-        self.__grades = []
+        self.__courses = []  
+        self.__grades = [] # {"Coursename": grade}
         Student.total_students += 1  # increment every time a new Student is created
 
     @classmethod
@@ -19,10 +19,41 @@ class Student:
         return f"Hello, my name is {self.name}, I am {self.age} years old"
     
     # setting and updating the GPA of the current Student instance
-    def update_gpa(self, value):
-        value = int(value)
-        if 0.0 <= value <= 4.0:
-            self.__gpa = value
+
+    def update_gpa(self):
+        total_gpcu = 0
+        total_cu = 0
+        gpa = 0
+
+        for i in self.__grades:
+            
+            for k,v in i.items():
+                if 0 <= v < 60:
+                    grade_point = 0.0
+                elif 60 <= v < 70:
+                    grade_point = 1.0
+                elif 70 <= v < 75:
+                    grade_point = 2.0
+                elif 75 <= v < 80:
+                    grade_point = 2.5
+                elif 80 <= v < 85:
+                    grade_point = 3.0
+                elif 85 <= v < 90:
+                    grade_point = 3.5
+                elif 90 <= v < 101:
+                    grade_point = 4.0
+                for course in self.__courses:
+                    if course._Course__course_name == k:
+                        credit_units = course._Course__credit_units
+                        total_cu += credit_units
+                        gpcu = credit_units * grade_point
+                        total_gpcu += gpcu
+
+        
+        gpa = total_gpcu / total_cu
+        self.__gpa = gpa
+        return "GPA calculated and updated"
+
 
     # returning the GPA of the current Student instance
     def get_gpa(self):
@@ -119,6 +150,7 @@ class Course:
     def __init__(self):
         self.__course_name = "Course"
         self.__code = "Code"
+        self.__credit_units = 0
         self.__students = []
         self.__instructors = []
         self.__grades = []
@@ -153,6 +185,12 @@ class Course:
     def remove_student(self, student_obj):
         self.__students.remove(student_obj)
         student_obj.remove_course(self)
+
+        for i in self.__grades:
+            for k,v in i.items():
+                if k == student_obj.name:
+                    pair = {self.__course_name : v}
+                    student_obj._Student__grades.remove(pair) # concurrently remove this grade from Student's self.__grades
         self._json_write()
     
 
@@ -162,9 +200,10 @@ class Course:
         for i in self.__students:
             print(f"- {i.name}")
 
-    def update_course(self, course_name, code):
+    def update_course(self, course_name, code, credit_units):
         self.__course_name = course_name
         self.__code = code
+        self.__credit_units = credit_units
         self._json_write()
         
    
@@ -190,51 +229,49 @@ class Course:
 
 
     def add_grades(self, student_obj, grade):
-        if grade in range(0, 101):
-            for i in self.__grades:
-                for k,v in i.items():
-                    if student_obj.name == k:
-                        pair = {student_obj.name : i[student_obj.name]}
-                        attempts = 0
-                        while attempts < 3:
-                            query = input(f"Grade for {student_obj.name} available. Do you want to update it ? (Yes or No)")
-                            query = query.upper()
-
-                            if query[0] == "N":
-                                return f"Grade for {student_obj.name} not updated"
-                            elif query[0] == "Y":
-                                self.__grades.remove(pair)
-                                student_obj._Student__grades.remove({self.__course_name : pair[student_obj.name]})
-
-                                self.__grades.append({student_obj.name : grade})
-                                student_obj._Student__grades.append({self.__course_name : grade})
-                                self._json_write()
-                                return f"Grade for {student_obj.name}  successfully updated"
-                            else:
-                                print("Wrong choice made..........TRY AGAIN")
-                                attempts += 1
-                        return "Too many wrong attempts"
-                #break
-
-            self.__grades.append({student_obj.name : grade})
-            student_obj._Student__grades.append({self.__course_name : grade})
-            self._json_write()
-            return f"Grade for {student_obj.name} has been successfully added"
+        if student_obj not in self.__students:
+            return f"{student_obj.name} is not registered for this course"
         else:
-            return f"Grade must be between 0 to 100"
+            if grade in range(0, 101):
+                for i in self.__grades:
+                    for k,v in i.items():
+                        if student_obj.name == k:
+                            pair = {student_obj.name : i[student_obj.name]}
+                            attempts = 0
+                            while attempts < 3:
+                                query = input(f"Grade for {student_obj.name} available. Do you want to update it ? (Yes or No)")
+                                query = query.upper()
+
+                                if query[0] == "N":
+                                    return f"Grade for {student_obj.name} not updated"
+                                elif query[0] == "Y":
+                                    self.__grades.remove(pair)
+                                    student_obj._Student__grades.remove({self.__course_name : pair[student_obj.name]})
+
+                                    self.__grades.append({student_obj.name : grade})
+                                    student_obj._Student__grades.append({self.__course_name : grade})
+                                    self._json_write()
+                                    return f"Grade for {student_obj.name}  successfully updated"
+                                else:
+                                    print("Wrong choice made..........TRY AGAIN")
+                                    attempts += 1
+                            return "Too many wrong attempts"
+                    #break
+
+                self.__grades.append({student_obj.name : grade})
+                student_obj._Student__grades.append({self.__course_name : grade})
+                self._json_write()
+                return f"Grade for {student_obj.name} has been successfully added"
+            else:
+                return f"Grade must be between 0 to 100"
                 
 
     def _json_write(self):
-        # Coursenamme
-        #coresecode 
-        # instructors : []
-        #students : [{name: NAME,
-        #             ]
-
 
         file = {
             "Course Name": self.__course_name,
             "Code": self.__code,
+            "Credit Units": self.__credit_units,
             "Instructors": self.__instructors,
             "Students": []
         }
