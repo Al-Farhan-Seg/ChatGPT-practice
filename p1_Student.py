@@ -153,7 +153,7 @@ class GraduateStudent(Student):
     def __init__(self, name, age, thesis_title, supervisor):
         super().__init__(name, age)
         self.thesis_title = thesis_title
-        self.__thesis_stage = ""
+        self.__thesis_stage = "Not-Set"
         self.supervisor = supervisor
 
         # Add-on: Let GraduateStudent override show_profile() to include thesis and supervisor.
@@ -163,10 +163,30 @@ Name: {self.name}
 Age: {self.age}
 GPA: {self.get_gpa()}
 Thesis: {self.thesis_title}
+Thesis Stage: {self.__thesis_stage}
 Supervisor: {self.supervisor}"""
     
     def set_thesis_stage(self):
-        choice = int(input(""))
+        attempts = 0
+        while attempts < 3:
+            try:
+                choice = int(input("""_____________THESIS STAGE_____________
+        Choose a stage for the Thesis:
+                1. Pending
+                2. Defended
+                3. Approved
+                """))
+                if choice == 1:
+                    self.__thesis_stage = "Pending"
+                elif choice == 2:
+                    self.__thesis_stage = "Defended"
+                elif choice == 3:
+                    self.__thesis_stage = "Approved"
+            except ValueError:
+                print("Please enter only an INTEGER as choice")
+        return "Too many failed attempts"
+    
+
     
 
 # Modelling a relationship between Student and Course
