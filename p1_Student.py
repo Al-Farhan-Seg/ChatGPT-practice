@@ -14,9 +14,6 @@ class Student:
     @classmethod
     def get_total_students(cls):
         return f"Total Students Created: {cls.total_students}"
-
-    def introduce(self):
-        return f"Hello, my name is {self.name}, I am {self.age} years old"
     
     # setting and updating the GPA of the current Student instance
     def update_gpa(self):
@@ -124,11 +121,13 @@ Courses: {emp}"""
             return False
         else:
             self.__courses.append(course_obj)
+            course_obj.add_student(self)
             return True
     
     def remove_course(self, course_obj):
         if course_obj in self.__courses:
             self.__courses.remove(course_obj)
+            course_obj.remove_student(self)
             return True
         else:
             return False
@@ -154,6 +153,7 @@ class GraduateStudent(Student):
     def __init__(self, name, age, thesis_title, supervisor):
         super().__init__(name, age)
         self.thesis_title = thesis_title
+        self.__thesis_stage = ""
         self.supervisor = supervisor
 
         # Add-on: Let GraduateStudent override show_profile() to include thesis and supervisor.
@@ -164,6 +164,9 @@ Age: {self.age}
 GPA: {self.get_gpa()}
 Thesis: {self.thesis_title}
 Supervisor: {self.supervisor}"""
+    
+    def set_thesis_stage(self):
+        choice = int(input(""))
     
 
 # Modelling a relationship between Student and Course
@@ -233,22 +236,17 @@ class Course:
     def get_course(self):
         return f"You have enrolled for {self.__course_name} ({self.__code})"
     
-    def add_instructor(self):
+    def add_instructor(self, instructor_obj):
         if len(self.__instructors) == 3:
             return "Cannot add more than 3 instructors for a course"
         else:
-            attemmpts = 0
-            while attemmpts < 3:
-                name = input("Enter name of new instructor: ")
-                name = name.strip()
-                name = name.upper()
-                if name in self.__instructors:
-                    print("Instructor already assigned to course")
-                    attemmpts += 1
-                else:
-                    self.__instructors.append(name)
-                    self._json_write()
-                    return f"{name} successfully assigned to {self.__course_name}({self.__code})"
+            
+            if instructor_obj.name in self.__instructors:
+                return "Instructor already assigned to course"
+            else:
+                self.__instructors.append(instructor_obj.name)
+                self._json_write()
+                return f"{instructor_obj.name} successfully assigned to {self.__course_name}({self.__code})"
 
 
     def add_grades(self, student_obj, grade):
@@ -317,6 +315,11 @@ class Course:
         with open(file_path, "w") as json_file:
             data = json.dump(file, json_file, indent=3)
 
+class Instructor:
+    def __init__(self, name, gender):
+        self.name = name
+        self.gender = gender
+
 
 class University:
 
@@ -331,7 +334,7 @@ class University:
             return "Please enter a COURSE to add to the University"
         else:
             if course_obj in self.courses:
-                return f"{course_obj._Course__course_name}already registered to {self.name}"
+                return f"{course_obj._Course__course_name} already registered to {self.name}"
             else:
                 self.courses.append(course_obj)
                 return f"{course_obj._Course__course_name} successfully registered to {self.name}"
