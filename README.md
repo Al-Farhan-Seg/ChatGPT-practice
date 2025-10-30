@@ -1,6 +1,6 @@
 # <i>Python OOP Project and Practice</i>
 ## ChatGPT Python auto-generated questions designed in phases
-#### It involves introducing a PHASE receiving a query, building, returning code to AI, review by AI, suggested add_ons by AI, post-review by AI and finally new PHASE introduction.
+#### It involves me giving AI a prompt, receiving a task from AI,coding & building, returning code to AI, review by AI, suggested add_ons by AI, post-review by AI and finally new PHASE introduction.
 
 ## Currently:
 <ol>
