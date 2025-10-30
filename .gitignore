@@ -46,6 +46,8 @@ Phase_One_adds.py
 bank_test.py
 student_test.py
 *.csv
+*.txt
+*.json
 
 # Jupyter
 .ipynb_checkpoints
