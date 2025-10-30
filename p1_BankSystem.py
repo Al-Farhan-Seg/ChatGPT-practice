@@ -1,5 +1,5 @@
 from datetime import datetime
-import string, random, csv, os
+import string, random, csv, os, hashlib
 
 class BankAccount:
     def assign_balance(self):
@@ -25,7 +25,7 @@ class BankAccount:
         self.owner = owner
         self.__acc_no = 0
         self.__balance = self.assign_balance()
-        self.__transactions = []
+        self.__transactions = [] #find a way of loading previous transactions when program opens
         self.__pin = 1
         self.__csv = [[" ", " ", self.owner, " ", " "],
                       ["Amount", "Time", "Transaction", "ID", "Balance"]]
@@ -128,7 +128,7 @@ Transaction ID: {ID}"""
         while attempts < 3:
             bal_disp = self._verify_pin(attempts)
             if bal_disp == True:
-                return f"Account Balance: {self.__balance}"
+                return f"Account Balance: UGX {self.__balance}"
             elif bal_disp == False:
                 attempts += 1
             else:
@@ -196,9 +196,17 @@ Transaction ID: {ID}"""
     
 
     def _verify_pin(self, attempts):
+        s_p = hashlib.sha256()
+        stored_pin = str(self.__pin)
+        s_p.update(stored_pin.encode())
+        stored_pin_hash = s_p.hexdigest()
         try:
-            pin = int(input("Enter account PIN: "))
-            if pin != self.__pin:
+            u_p = hashlib.sha256()
+            user_pin = int(input("Enter account PIN: "))
+            u_p.update(str(user_pin).encode())
+            user_pin_hash = u_p.hexdigest()
+
+            if user_pin_hash != stored_pin_hash:
                 # attempts += 1
                 print("PIN incorrect")
                 return False
