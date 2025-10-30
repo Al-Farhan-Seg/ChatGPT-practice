@@ -1,5 +1,6 @@
 from datetime import datetime
 import string, random, csv, os, hashlib
+import pyinputplus as pyip
 
 class BankAccount:
     def assign_balance(self):
@@ -202,7 +203,7 @@ Transaction ID: {ID}"""
         stored_pin_hash = s_p.hexdigest()
         try:
             u_p = hashlib.sha256()
-            user_pin = int(input("Enter account PIN: "))
+            user_pin = int(pyip.inputPassword("Enter account PIN: "))
             u_p.update(str(user_pin).encode())
             user_pin_hash = u_p.hexdigest()
 
