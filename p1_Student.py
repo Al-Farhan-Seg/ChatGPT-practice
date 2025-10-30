@@ -2,13 +2,20 @@ import os, json
 class Student:
     total_students = 0  # class variable shared across all instances
 
+    # setting the e-mail of the current Student instance {since it is private}
+    def set_email(self):
+        name = self.name
+        name = name.replace(" ", "")
+        self.__email = f"{name}".lower() + ".iuiu.ac@gmail.com"
+        return self.__email
+
     def __init__(self, name, age):
         self.name = name
         self.age = age
         self.__gpa = 0
-        self.__email = ""
-        self.__courses = []  
-        self.__grades = [] # {"Coursename": grade}
+        self.__email = self.set_email()
+        self.__courses = []  # full Course_obj
+        self.__grades = [] # {Course.__course_name : grade}
         Student.total_students += 1  # increment every time a new Student is created
 
     @classmethod
@@ -91,11 +98,6 @@ Course: {course_obj._Course__course_name}
 Grade: {mark}
 Grade Point: {grade_point}
 Rank: {rank}"""
-
-
-    # setting the e-mail of the current Student instance {since it is private}
-    def set_email(self):
-        self.__email = f"{self.name}".lower() + ".iuiu.ac@gmail.com"
 
     # returning the e-mail of the current Student instance
     def get_email(self):
@@ -197,9 +199,9 @@ class Course:
         self.__course_name = "Course"
         self.__code = "Code"
         self.__credit_units = 0
-        self.__students = []
-        self.__instructors = []
-        self.__grades = []
+        self.__students = [] # full Student_obj
+        self.__instructors = [] # only "Instructor_obj.name"
+        self.__grades = [] # {Student_obj.name : grade}
         Course.total_courses += 1
 
     # adding the Student instance to the STYDENT'S LIST of the Course instance
@@ -357,6 +359,7 @@ class University:
                 return f"{course_obj._Course__course_name} already registered to {self.name}"
             else:
                 self.courses.append(course_obj)
+                self.uni_json_write()
                 return f"{course_obj._Course__course_name} successfully registered to {self.name}"
             
     def add_student(self, student_obj):
@@ -368,4 +371,61 @@ class University:
                 return f"{student_obj.name} already registered to {self.name}"
             else:
                 self.students.append(student_obj)
+                self.uni_json_write()
                 return f"{student_obj.name} successfully registered to {self.name}"
+            
+            
+    def uni_json_write(self):
+        top_file = {
+            "University" : self.name,
+            "Courses" : [],
+            "Students": []
+        }
+
+        courses_list = []
+        #Course_logic
+        for i in self.courses:
+            students = []
+
+            courses_file = {
+            "Course_name" : i._Course__course_name,
+            "Code" : i._Course__code,
+            "Credit Units" : i._Course__credit_units,
+            "Instructors" : i._Course__instructors,
+            "Students" : [],
+        }
+            for stu in i._Course__grades:
+                students.append(stu)
+            courses_file["Students"] = students
+            courses_list.append(courses_file)
+            
+        top_file["Courses"] = courses_list
+
+        students_list = []
+        for j in self.students:
+
+
+            student_file = {
+                "Name" : j.name,
+                "Age" : j.age,
+                "E-mail" : j._Student__email,
+                "Courses" : [],
+                "Grades" : []
+            }
+            courses = []
+            grades = []
+            for i in j._Student__courses:
+                courses.append(i._Course__course_name)
+            student_file["Courses"] = courses
+            for i in j._Student__grades:
+                grades.append(i)
+            student_file["Grades"] = grades
+
+            students_list.append(student_file)
+        top_file["Students"] = students_list
+
+
+
+        filepath = rf"{self.name}_data.json"
+        with open(filepath, "w") as uni_data:
+            content = json.dump(top_file, uni_data, indent=3)
