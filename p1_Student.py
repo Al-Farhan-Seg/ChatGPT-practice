@@ -98,6 +98,17 @@ Course: {course_obj._Course__course_name}
 Grade: {mark}
 Grade Point: {grade_point}
 Rank: {rank}"""
+    
+    def average_mark(self):
+        total = 0
+        num = 0
+        for i in self.__grades:
+            for k,v in i.items():
+                total += v
+                num += 1
+        average = total / num
+
+        return F"Average Mark: {average}"
 
     # returning the e-mail of the current Student instance
     def get_email(self):
